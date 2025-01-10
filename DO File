@@ -1,0 +1,239 @@
+clear
+set more off
+capture log close
+
+cd "/Users/ececilyh/Desktop/UNC/Junior Year/Junior Fall/PLCY 460/Stata/Final Project"
+
+log using "FinalProject.log", replace
+
+use "/Users/ececilyh/Desktop/UNC/Junior Year/Junior Fall/PLCY 460/Stata/Final Project/FinalProject.dta"
+
+Ftotinc - income cleaning 
+sum ftotinc
+keep if ftotinc >= 0
+keep if ftotinc <= 9999997
+sum ftotinc
+
+
+
+Mom and PopLoc Cleaning
+tab poploc
+gen FatherLocation = 1 if poploc<=1
+replace FatherLocation = 0 if poploc == 0 
+tab FatherLocation
+tab momloc
+gen MotherLocation = 1 if momloc<=1
+replace MotherLocation = 0 if momloc == 0 
+tab MotherLocation
+gen MotherHome = 0 if momloc == 0
+replace MotherHome = 1 if momloc != 0
+tab MotherHome
+gen FatherHome = 0 if poploc == 0
+replace FatherHome = 1 if poploc != 0
+tab FatherHome
+
+
+
+
+School Type Cleaning
+gen PublicSchool = 1 if schltype == 2
+replace PublicSchool = 0 if schltype == 3
+tab PublicSchool
+
+
+
+Educational Attainment Cleaning
+tab educd
+drop if educd <= 60
+drop if educd == 65
+drop if educd == 71
+drop if educd == 115
+drop if educd == 999
+tab educd
+
+gen HighSchool = educd
+replace HighSchool = 067 if educd == 063 | educd == 064
+label define HighSchool_labels 067 "High School or Equivalent" 064 "GED" 063 "High School Diploma"
+label values HighSchool HighSchool_labels
+tab educd
+
+tab HighSchool
+
+
+gen EducationalAttainment = HighSchool
+replace EducationalAttainment = 117 if HighSchool == 114 | HighSchool == 116
+label define EducationalAttainment_labels 117 "Post Bachelor's" 114 "Master's Degree" 116 "Doctoral Degree" 61 “No Degree” 67 "High School" 81 "Associate's Degree" 101 "Bachelor's Degree"
+
+label values EducationalAttainment EducationalAttainment_labels
+tab educd
+tab HighSchool
+tab EducationalAttainment
+
+
+recode educd (2 = 0 "No schooling completed")(11 = 1 "Nursery school, preschool")(12 = 2 "Kindergarten")(14 = 3 "Grade 1")(15 = 4 "Grade 2")(16 = 5 "Grade 3")(17 = 6 "Grade 4")(22 = 7 "Grade 5")(23 = 8 "Grade 6")(25 = 9 "Grade 7")(26 = 10 "Grade 8")(30 = 11 "Grade 9")(40 = 12 "Grade 10")(50/61 = 13 "Grade 11")(63/65 = 14 "High school diploma or equivalent")(71 = 15 "1+ years of college, no diploma")(81 = 16 "Associate's degree")(101 = 18 "Bachelor's degree")(114/115 = 20 "Master's/professional degree")(116 = 23 "Doctoral degree"), gen(yrseduc)
+
+
+reg EducationalAttainment ftotinc FatherLocation MotherLocation PublicSchool 
+
+
+
+drop year
+drop sample
+drop serial
+drop cbserial
+drop hhwt
+drop cluster
+drop strata
+drop gq
+drop perwt
+drop diffrem
+
+
+
+
+
+
+
+drop year
+drop sample
+drop serial
+drop cbserial
+drop hhwt
+drop cluster
+drop strata
+drop gq
+drop perwt
+drop diffrem
+
+*Ftotinc - income cleaning 
+sum ftotinc
+keep if ftotinc >= 0
+keep if ftotinc <= 9999997
+sum ftotinc
+
+
+
+*Mom and PopLoc Cleaning
+tab poploc
+gen FatherLocation = 1 if poploc<=1
+replace FatherLocation = 0 if poploc == 0 
+tab FatherLocation
+tab momloc
+gen MotherLocation = 1 if momloc<=1
+replace MotherLocation = 0 if momloc == 0 
+tab MotherLocation
+gen MotherHome = 0 if momloc == 0
+replace MotherHome = 1 if momloc != 0
+tab MotherHome
+gen FatherHome = 0 if poploc == 0
+replace FatherHome = 1 if poploc != 0
+tab FatherHome
+
+
+
+
+*School Type Cleaning
+gen PublicSchool = 1 if schltype == 2
+replace PublicSchool = 0 if schltype == 3
+tab PublicSchool
+
+
+
+*Educational Attainment Cleaning
+
+
+recode educd (2/61 = 13 "No diploma")(63/65 = 14 "High school diploma or equivalent")(71 = 15 "1+ years of college, no diploma")(81 = 16 "Associate's degree")(101 = 18 "Bachelor's degree")(114/115 = 20 "Master's/professional degree")(116 = 23 "Doctoral degree"), gen(yrseduc)
+gen EducationYears = educd
+
+
+tab MotherLocation
+tab FatherLocation
+tab PublicSchool
+
+sum (i.EducationYears ftotinc FatherLocation MotherLocation PublicSchool)
+
+
+reg EducationYears ftotinc FatherLocation MotherLocation PublicSchool
+outreg2 using finalregression.xlsx, append
+
+sum, sep(0) 
+
+ssc install outreg2 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+drop year
+drop sample
+drop serial
+drop cbserial
+drop hhwt
+drop cluster
+drop strata
+drop gq
+drop perwt
+drop diffrem
+
+
+
+*Ftotinc - income cleaning 
+sum ftotinc
+keep if ftotinc >= 0
+keep if ftotinc <= 9999997
+sum ftotinc
+
+*Mom and PopLoc Cleaning
+tab poploc
+gen FatherLocation = 1 if poploc<=1
+replace FatherLocation = 0 if poploc == 0 
+tab FatherLocation
+tab momloc
+gen MotherLocation = 1 if momloc<=1
+replace MotherLocation = 0 if momloc == 0 
+tab MotherLocation
+gen MotherHome = 0 if momloc == 0
+replace MotherHome = 1 if momloc != 0
+tab MotherHome
+gen FatherHome = 0 if poploc == 0
+replace FatherHome = 1 if poploc != 0
+tab FatherHome
+
+*School Type Cleaning
+gen PublicSchool = 1 if schltype == 2
+replace PublicSchool = 0 if schltype == 3
+tab PublicSchool
+
+*Educational Attainment Cleaning
+
+drop if educd == 71
+drop if educd == 1 
+
+recode educd (2/61 = 0 "No Diploma")(63/65 = 1 "High School Diploma or Equivalent")(81 = 2 "Associate's Degree")(101 = 3 "Bachelor's degree")(114/115 = 4 "Master's/professional degree")(116 = 5 "Doctoral degree"), gen(yrseduc)
+
+gen EducationLabel = yrseduc
+label define EdLabel 0 "No Diploma" 1 "High School Diploma or Equivalent" 2 "Associate's Degree" 3 "Bachelor's Degree" 4 "Master's or Professional Degree" 5 "Doctoral Degree" 
+
+label values EducationLabel EdLabel
+tab EducationLabel
+
+tab MotherLocation
+tab FatherLocation
+tab PublicSchool
+
+sum (i.EducationLabel ftotinc FatherLocation MotherLocation PublicSchool)
+
+reg EducationLabel ftotinc FatherLocation MotherLocation PublicSchool
+outreg2 using finalregression.xlsx, append
+
+sum, sep(0) 
+ssc install outreg2 
